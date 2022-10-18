@@ -3,7 +3,7 @@
 importScripts('js/sw-utils.js');
 
 
-const STATIC_CACHE = 'static-v2';
+const STATIC_CACHE = 'static-v3';
 const DYNAMIC_CACHE = 'dynamic-v1';
 const INMUTABLE_CACHE = 'inmutable-v1';
 
@@ -38,19 +38,20 @@ self.addEventListener('install', e => {
          const cacheInmutable = caches.open(INMUTABLE_CACHE).then(cache => 
             cache.addAll(APP_SHELL_INMUMTABLE));
    
-      e.waitUntil(Promise.all([cacheInmutable, cacheStatic]) );
+      e.waitUntil(Promise.all([cacheStatic, cacheInmutable ]) );
 
 });
 
 self.addEventListener('activate', e => {
      const respuesta = caches.keys().then(keys => {
-          if( key !== STATIC_CACHE && key.includes('static')) {
-            return caches.delete(key);
+          keys.forEach(key => {
+            if( key !== STATIC_CACHE && key.includes('static')) {
+              return caches.delete(key);
           }
+        });
      });
      e.waitUntil(respuesta);
 });
-
 
 self.addEventListener('fetch', e => {
       const respuesta = caches.match(e.request).then(res => {
